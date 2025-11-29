@@ -1,0 +1,130 @@
+<!-- Main container with dark theme and Bengali font -->
+<main class="bg-black text-white min-h-screen flex flex-col justify-between p-4 max-w-lg mx-auto">
+  
+  <!-- Top Ad Banner -->
+  <header class="w-full py-2 bg-gray-800 text-center text-gray-400 border border-dashed border-gray-600">
+    Advertisement
+  </header>
+
+  <!-- Dynamic Content Area -->
+  <div class="flex-grow flex flex-col items-center justify-center text-center py-8">
+    @switch (view()) {
+      @case ('start') {
+        <div class="flex flex-col items-center justify-center space-y-8 fade-in w-full">
+          <h1 class="text-3xl md:text-4xl font-bold text-red-500 leading-tight">
+            যাকে ভোট দিবা সে তো জিতবেই… <br/> তুমি কোন দলের লাঠি-চড়-ইট-গ্রেপ্তার খাবা?
+          </h1>
+          
+          <input 
+            type="text" 
+            [value]="userName()"
+            (input)="userName.set($any($event.target).value)"
+            placeholder="এখানে আপনার নাম লিখুন"
+            class="w-full max-w-sm bg-gray-800 border-2 border-gray-600 rounded-lg py-3 px-4 text-white text-center text-lg focus:outline-none focus:border-red-500 transition-colors"
+            aria-label="User name input"
+          />
+
+          <button 
+            (click)="startQuiz()" 
+            [disabled]="!userName().trim()"
+            class="bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-8 rounded-lg text-2xl shadow-lg shadow-red-500/50 transition-transform transform hover:scale-105 disabled:bg-gray-500 disabled:shadow-none disabled:cursor-not-allowed disabled:scale-100">
+            আমার কপাল দেখো
+          </button>
+        </div>
+      }
+      @case ('quiz') {
+        <div class="w-full fade-in">
+          @if (currentQuestion(); as question) {
+            <div class="bg-gray-900 p-6 rounded-lg border border-gray-700">
+              <p class="text-gray-400 mb-4">প্রশ্ন {{ currentQuestionIndex() + 1 }}/{{ currentQuizQuestions().length }}</p>
+              <h2 class="text-2xl font-semibold mb-6 text-green-400">{{ question.question }}</h2>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @for (option of question.options; track option) {
+                  <button (click)="answerQuestion()" class="bg-gray-800 hover:bg-green-700 text-left text-white p-4 rounded-lg transition-colors duration-300 border border-gray-600 hover:border-green-500">
+                    {{ option }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+      @case ('loading') {
+        <div class="flex flex-col items-center justify-center space-y-6 fade-in">
+          <p class="text-2xl text-yellow-400">{{ userName() }}'র রাজনৈতিক ভাগ্য গণনা করা হচ্ছে...</p>
+          <div class="text-6xl flex space-x-6">
+            <span class="shake-animation" style="animation-delay: 0s;">🏒</span>
+            <span class="shake-animation" style="animation-delay: 0.2s;">🧱</span>
+            <span class="shake-animation" style="animation-delay: 0.4s;">💨</span>
+          </div>
+          <p class="text-xl text-gray-300">অপেক্ষা করুন, আপনার জন্য বিশেষ দুর্গতি খোঁজা হচ্ছে!</p>
+        </div>
+      }
+      @case ('result') {
+        <div class="w-full flex flex-col items-center space-y-6 fade-in">
+          @if (generatedImage()) {
+            <img [src]="generatedImage()" alt="নির্বাচনী ভাগ্য" class="max-w-full rounded-lg border-2 border-red-500" />
+            <div class="grid grid-cols-2 gap-3 w-full pt-4">
+              <button (click)="share('messenger')" class="col-span-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 4.974 0 11.111c0 3.494 1.833 6.559 4.606 8.544L3.23 24l5.42-2.353C9.998 21.875 11.023 22 12 22c6.627 0 12-4.974 12-11.111S18.627 0 12 0zm1.442 16.202l-3.235-3.235-5.832 3.235 6.229-6.39-3.422-3.235 5.832-3.235-6.229 6.39 3.657 3.469z"/></svg>
+                <span>Messenger</span>
+              </button>
+              <button (click)="share('facebook')" class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v2.385z"/></svg>
+                <span>Facebook</span>
+              </button>
+              <button (click)="downloadImage()" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11h5l-9 10-9-10h5v-11h8v11zm3 8v3h-14v-3h-2v5h18v-5h-2z"/></svg>
+                 <span>ডাউনলোড</span>
+              </button>
+              <button (click)="playAgain()" class="col-span-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm10 8a1 1 0 011-1h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 111.885-.666A5.002 5.002 0 0014.001 13H11a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
+                <span>আবার দেখুন</span>
+              </button>
+              <a href="https://www.facebook.com/share/g/1CywdqeRte/" target="_blank" rel="noopener noreferrer" class="col-span-2 bg-blue-800 hover:bg-blue-900 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v2.385z"/></svg>
+                <span>আমাদের ফেসবুক গ্রুপে জয়েন হোন</span>
+              </a>
+            </div>
+          } @else {
+             <p>ফলাফল লোড হচ্ছে...</p>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Disclaimer and Bottom Ad Banner -->
+  <footer class="w-full text-center">
+    <p class="text-xs text-gray-500 mb-4">মজার জন্য বানানো। ভোট দিতে যাইয়ো, লাঠি খাইয়ো না।</p>
+    <div class="w-full py-2 bg-gray-800 text-center text-gray-400 border border-dashed border-gray-600">
+      Advertisement
+    </div>
+  </footer>
+</main>
+
+
+<!-- Hidden div for generating the result image with html2canvas -->
+<!-- It is positioned off-screen to not interfere with the layout -->
+<div class="absolute -left-[9999px] top-auto" #resultCanvasContainer>
+  @if(selectedResult(); as result) {
+  <div 
+    class="relative w-[400px] h-[400px] flex flex-col justify-center items-center text-center p-4 bg-cover bg-center text-white"
+    [style.background-image]="'url(' + result.imageUrl + ')'">
+    
+    <!-- Dark overlay for text readability -->
+    <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+
+    <!-- Content on top of the overlay -->
+    <div class="relative z-10 flex flex-col justify-between h-full w-full p-4 border-4 border-l-green-500 border-t-green-500 border-r-red-500 border-b-red-500">
+        <h2 class="text-lg font-bold text-green-400" style="text-shadow: 2px 2px 4px #000;">
+          {{ userName() }},<br/> ২০২৬ এর নির্বাচনে আপনার সাথে যা ঘটতে চলেছে
+        </h2>
+        <div class="flex-grow flex items-center justify-center">
+          <p class="text-3xl font-bold text-red-400 leading-tight" style="text-shadow: 2px 2px 6px #000;">{{ result.text }}</p>
+        </div>
+        <p class="text-lg mt-4 text-gray-300" style="text-shadow: 2px 2px 4px #000;">কপালের লিখন না যায় খণ্ডন 😌</p>
+    </div>
+  </div>
+  }
+</div>
