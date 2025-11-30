@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, ViewChild, ElementRef, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, ViewChild, ElementRef, effect, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // This declares the html2canvas function so TypeScript knows about it.
@@ -21,7 +21,7 @@ interface Result {
   templateUrl: './app.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
   // --- STATE MANAGEMENT ---
   view = signal<'start' | 'quiz' | 'loading' | 'result'>('start');
   userName = signal('');
@@ -37,6 +37,8 @@ export class AppComponent {
   generatedImage = signal<string | null>(null);
 
   @ViewChild('resultCanvasContainer') resultCanvasContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('headerAdContainer') headerAdContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('footerAdContainer') footerAdContainer!: ElementRef<HTMLDivElement>;
 
   constructor() {
     effect(() => {
@@ -46,6 +48,50 @@ export class AppComponent {
         setTimeout(() => this.generateImageFromCanvas(), 100);
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Load header ad (320x50)
+    this.loadAd(
+      this.headerAdContainer.nativeElement,
+      '1b8e8df2335dff7a6be218b1ab26410a',
+      320,
+      50
+    );
+
+    // Load footer ad (468x60)
+    this.loadAd(
+      this.footerAdContainer.nativeElement,
+      '5bf72b39c064825362f604fcc3b5c284',
+      468,
+      60
+    );
+  }
+
+  private loadAd(container: HTMLElement, key: string, width: number, height: number): void {
+    if (!container) return;
+    
+    // Create the configuration script
+    const configScript = document.createElement('script');
+    configScript.type = 'text/javascript';
+    configScript.innerHTML = `
+        atOptions = {
+            'key' : '${key}',
+            'format' : 'iframe',
+            'height' : ${height},
+            'width' : ${width},
+            'params' : {}
+        };
+    `;
+
+    // Create the invoker script
+    const invokeScript = document.createElement('script');
+    invokeScript.type = 'text/javascript';
+    invokeScript.src = `//www.highperformanceformat.com/${key}/invoke.js`;
+    
+    // Append scripts to the container to load the ad
+    container.appendChild(configScript);
+    container.appendChild(invokeScript);
   }
 
   // --- QUIZ LOGIC ---
@@ -174,7 +220,7 @@ export class AppComponent {
             { question: "একজন রাজনীতিবিদের অবসরের বয়স কত হওয়া উচিত?", options: ["যতদিন হাঁটতে পারে", "যতদিন কথা বলতে পারে", "যতদিন घोटाলা করতে পারে", "তাদের কোনো অবসর নেই"] },
             { question: "নির্বাচনে নারীদের অংশগ্রহণ নিয়ে আপনার মতামত কী?", options: ["খুবই ইতিবাচক", "শুধু ভোট দেওয়ার জন্য ঠিক আছে", "তাদেরকে রান্নাবান্নাতেই মানায়", "তারা আসলে পুরুষের চেয়ে ভালো নেতা"] },
             { question: "ছাত্র রাজনীতি নিয়ে আপনার ভাবনা কী?", options: ["দেশ গড়ার কারিগর", "ক্যাম্পাসে র‍্যাগিং এর মূল হোতা", "বড় ভাইদের চামচামি", "পড়াশোনা বাদ দিয়ে সব করে"] },
-            { question: "বাজেট ঘোষণার পর আপনার প্রতিক্রিয়া কী হয়?", options: ["কিছুই বুঝি না, তাই প্রতিক্রিয়া নেই", "কোন জিনিসের দাম বাড়ল তার হিসাব করি", "ফেসবুকে段子 বানাই", "সরকারের প্রশংসা করে স্ট্যাটাস দেই"] },
+            { question: "বাজেট ঘোষণার পর আপনার প্রতিক্রিয়া কী হয়?", options: ["কিছুই বুঝি না, তাই प्रतिक्रिया নেই", "কোন জিনিসের দাম বাড়ল তার হিসাব করি", "ফেসবুকে段子 বানাই", "সরকারের প্রশংসা করে স্ট্যাটাস দেই"] },
             { question: "পত্রিকায় দুর্নীতির খবর পড়লে আপনি কী করেন?", options: ["দীর্ঘশ্বাস ফেলি", "খবরটা শেয়ার করে 'ছি ছি' লিখি", "চায়ের দোকানে ঝড় তুলি", "পরের পাতায় খেলার খবর পড়ি"] },
             { question: "আপনার মতে, দেশের সবচেয়ে বড় সমস্যা কী?", options: ["আমি নিজে", "আমার প্রতিবেশী", "ফেসবুকের ফেক আইডি", "রাজনীতিবিদরা"] },
             { question: "মধ্যরাতে কারা আপনার বাসার কলিং বেল বাজাতে পারে?", options: ["ভুল করে আসা ডেলিভারি বয়", "আপনার পুরানো প্রেমিক/প্রেমিকা", "বিদ্যুৎ বিল না দেওয়াতে লাইন ম্যান", "বিশেষ বাহিনীর লোক"] },
@@ -322,7 +368,7 @@ export class AppComponent {
             "আপনার ভাগ্য গণনা করে দেখা যাবে, আপনার কপালে লাঠি নয়, বরং নেতার মিষ্টি কথার বৃষ্টি আছে।",
             "আপনার এলাকায় এমন একজন প্রার্থী জয়ী হবেন যাকে এর আগে কেউ কখনো দেখেইনি।",
             "আপনার একটি পুরনো ছবি এডিট করে আপনাকে প্রতিপক্ষ দলের কর্মীর সাথে চায়ের আড্ডায় দেখিয়ে দেওয়া হবে।",
-            "ভোটের দিন আপনি এতো বেশি সেলফি তুলবেন যে আপনার ফোন আপনাকে 'পলিটিক্যাল ইনফ্লুয়েন্সার' হিসেবে শনাক্ত করবে।",
+            "ভোটের দিন আপনি এতো বেশি সেলফি তুলবেন যে আপনার ফোন আপনাকে 'পলিটিক্যাল ইনফ্ল্লুয়েন্সার' হিসেবে শনাক্ত করবে।",
             "আপনার বাসার ছাদে স্যাটেলাইট স্থাপন করা হবে... পার্শ্ববর্তী দেশের নির্বাচনী ফলাফল দেখার জন্য।",
             "আপনি এমন একটি চুইংগাম খাবেন যা ফোলানোর পর একটি রাজনৈতিক দলের প্রতীকের মতো দেখাবে এবং আপনি ভাইরাল হয়ে যাবেন।",
             "আপনাকে 'জাতীয় টাস্কফোর্স ফর মশা নিধন' এর প্রধান উপদেষ্টা নিয়োগ দেওয়া হবে।",

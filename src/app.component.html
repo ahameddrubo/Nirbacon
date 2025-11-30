@@ -2,8 +2,8 @@
 <main class="bg-black text-white min-h-screen flex flex-col justify-between p-4 max-w-lg mx-auto">
   
   <!-- Top Ad Banner -->
-  <header class="w-full py-2 bg-gray-800 text-center text-gray-400 border border-dashed border-gray-600">
-    Advertisement
+  <header #headerAdContainer class="w-full min-h-[50px] py-2 flex justify-center items-center bg-gray-800 text-center text-gray-400 border border-dashed border-gray-600">
+    <!-- Ad will be loaded here -->
   </header>
 
   <!-- Dynamic Content Area -->
@@ -12,7 +12,7 @@
       @case ('start') {
         <div class="flex flex-col items-center justify-center space-y-8 fade-in w-full">
           <h1 class="text-3xl md:text-4xl font-bold text-red-500 leading-tight">
-            যাকে ভোট দিবা সে তো জিতবেই… <br/> তুমি কোন দলের লাঠি-চড়-ইট-গ্রেপ্তার খাবা?
+            আগামী নির্বাচনে আপনার ভাগ্যে কি আছে পরীক্ষা করতে আপনার নাম লিখুন
           </h1>
           
           <input 
@@ -97,8 +97,8 @@
   <!-- Disclaimer and Bottom Ad Banner -->
   <footer class="w-full text-center">
     <p class="text-xs text-gray-500 mb-4">মজার জন্য বানানো। ভোট দিতে যাইয়ো, লাঠি খাইয়ো না।</p>
-    <div class="w-full py-2 bg-gray-800 text-center text-gray-400 border border-dashed border-gray-600">
-      Advertisement
+    <div #footerAdContainer class="w-full min-h-[60px] py-2 flex justify-center items-center bg-gray-800 text-center text-gray-400 border border-dashed border-gray-600">
+      <!-- Ad will be loaded here -->
     </div>
   </footer>
 </main>
